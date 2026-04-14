@@ -207,6 +207,7 @@ wss.on('connection', (ws) => {
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) {
+      if (ws.role === 'agent') console.log(`Terminating inactive agent: ${ws.clientId}`);
       ws.terminate();
       return;
     }

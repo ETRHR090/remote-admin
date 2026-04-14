@@ -4,12 +4,16 @@
   "description": "Remote administration demo via WebSockets",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build-agent": "pkg client-agent.js --out-dir dist --targets node18-win-x64,node18-linux-x64,node18-macos-x64"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }

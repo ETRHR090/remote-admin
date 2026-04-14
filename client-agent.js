@@ -19,7 +19,21 @@ if (!serverUrl || !clientId || !clientSecret) {
   process.exit(1);
 }
 
-const wsUrl = serverUrl.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws';
+/**
+ * Safely converts an http/https URL to ws/wss and appends the path
+ */
+function formatWsUrl(inputUrl) {
+  try {
+    const url = new URL(inputUrl);
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    return url.origin.replace(/\/$/, '') + '/ws';
+  } catch (e) {
+    // Fallback for simple string replacement if URL parsing fails
+    return inputUrl.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws';
+  }
+}
+
+const wsUrl = formatWsUrl(serverUrl);
 const metadata = {
   hostname: os.hostname(),
   platform: os.platform(),
@@ -36,6 +50,10 @@ function connect() {
     ws.send(JSON.stringify({ type: 'auth', role: 'agent', secret: clientSecret, clientId, metadata }));
     console.log(`Connected to remote admin server as '${clientId}'.`);
     sendStatus('online');
+  });
+
+  ws.on('ping', () => {
+    ws.pong();
   });
 
   ws.on('message', async (message) => {
@@ -95,6 +113,26 @@ async function handleCommand(data) {
       cpus: os.cpus().length,
     };
     sendResult({ type: 'result', requestId, command, result: info, success: true, timestamp: Date.now() });
+    return;
+  }
+
+  if (command === 'list_drives') {
+    const platform = os.platform();
+    if (platform === 'win32') {
+      exec('wmic logicaldisk get caption', (error, stdout) => {
+        if (error) {
+          sendResult({ type: 'result', requestId, command, result: null, success: false, error: error.message, timestamp: Date.now() });
+          return;
+        }
+        const drives = stdout.split('\n')
+          .map(line => line.trim())
+          .filter(line => line && !line.includes('Caption'))
+          .map(d => d.endsWith(':') ? d + '\\' : d);
+        sendResult({ type: 'result', requestId, command, result: drives, success: true, timestamp: Date.now() });
+      });
+    } else {
+      sendResult({ type: 'result', requestId, command, result: ['/'], success: true, timestamp: Date.now() });
+    }
     return;
   }
 
@@ -172,4 +210,4 @@ async function handleCommand(data) {
 }
 
 connect();
-setInterval(() => sendStatus('online'), 20000);
+setInterval(() => sendStatus('online'), 15000);
