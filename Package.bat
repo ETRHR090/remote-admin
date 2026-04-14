@@ -1,1 +1,0 @@
-npx pkg client-agent.js --out-dir dist --targets node18-win-x64,node18-linux-x64,node18-macos-x64

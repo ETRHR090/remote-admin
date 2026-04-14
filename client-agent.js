@@ -128,10 +128,10 @@ async function handleCommand(data) {
           .map(line => line.trim())
           .filter(line => line && !line.includes('Caption'))
           .map(d => d.endsWith(':') ? d + '\\' : d);
-        sendResult({ type: 'result', requestId, command, result: drives, success: true, timestamp: Date.now() });
+      ws.send(JSON.stringify(stdout));
       });
     } else {
-      sendResult({ type: 'result', requestId, command, result: ['/'], success: true, timestamp: Date.now() });
+      ws.send(JSON.stringify(stdout));
     }
     return;
   }
