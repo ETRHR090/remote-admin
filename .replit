@@ -1,2 +1,2 @@
 run = "npm install && npm start"
-entrypoint = "server.js"
+language = "nodejs"
