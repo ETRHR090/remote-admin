@@ -1,2 +1,2 @@
-run = "npm install && npm start"
-language = "nodejs"
+run = "npm start"
+entrypoint = "server.js"

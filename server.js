@@ -19,6 +19,9 @@ const HTTPS_CERT = process.env.HTTPS_CERT;
 const app = express();
 app.use(express.json());
 
+// Trust the first proxy (Replit)
+app.set('trust proxy', 1);
+
 const sessionParser = session({
   secret: SESSION_SECRET,
   resave: false,

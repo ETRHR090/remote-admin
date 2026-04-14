@@ -13,6 +13,8 @@ const readBtn = document.getElementById('read-btn');
 const saveBtn = document.getElementById('save-btn');
 const upBtn = document.getElementById('up-btn');
 const refreshBtn = document.getElementById('refresh-btn');
+const explorerListBtn = document.getElementById('explorer-list-btn');
+const explorerReadBtn = document.getElementById('explorer-read-btn');
 const currentPathDisplay = document.getElementById('current-path-display');
 const fileListEl = document.getElementById('file-list');
 const pathInput = document.getElementById('path-input');
@@ -183,6 +185,7 @@ function browsePath(path) {
     return;
   }
   setCurrentPath(path);
+  log(`Browsing ${path}`);
   sendCommand('list_dir', { path });
 }
 
@@ -266,6 +269,16 @@ readBtn.addEventListener('click', () => {
   sendCommand('read_file', { path });
 });
 
+explorerReadBtn.addEventListener('click', () => {
+  const path = pathInput.value.trim();
+  if (!path) {
+    log('Path is required to read file.');
+    return;
+  }
+  setCurrentPath(path);
+  sendCommand('read_file', { path });
+});
+
 saveBtn.addEventListener('click', () => {
   const path = pathInput.value.trim();
   if (!path) {
@@ -289,6 +302,16 @@ refreshBtn.addEventListener('click', () => {
   const path = currentPath || pathInput.value.trim() || getDefaultPathForClient(selectedClient);
   if (!path) {
     log('Path is required to refresh.');
+    return;
+  }
+  browsePath(path);
+});
+
+explorerListBtn.addEventListener('click', () => {
+  const selectedClient = clients.find((c) => c.clientId === currentClientId);
+  const path = pathInput.value.trim() || getDefaultPathForClient(selectedClient);
+  if (!path) {
+    log('Path is required to list directory.');
     return;
   }
   browsePath(path);
