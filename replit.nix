@@ -1,6 +1,5 @@
 { pkgs }: {
   deps = [
-    pkgs.nodejs_20
-    pkgs.nodePackages.npm
+    pkgs.nodejs-20_x
   ];
 }
