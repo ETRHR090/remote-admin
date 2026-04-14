@@ -17,6 +17,7 @@ const currentPathDisplay = document.getElementById('current-path-display');
 const fileListEl = document.getElementById('file-list');
 const pathInput = document.getElementById('path-input');
 const fileContentInput = document.getElementById('file-content');
+const breadcrumbEl = document.getElementById('breadcrumb');
 const logEl = document.getElementById('log');
 const clearLogBtn = document.getElementById('clear-log-btn');
 
@@ -98,10 +99,70 @@ function parentPath(path) {
   return parent;
 }
 
+function renderBreadcrumb(path) {
+  breadcrumbEl.innerHTML = '';
+  if (!path) {
+    return;
+  }
+
+  const normalized = path.replace(/\\/g, '/').replace(/\/+/g, '/');
+  const isWindows = /^[A-Za-z]:\//.test(normalized);
+  const isUnix = normalized.startsWith('/');
+
+  const segments = [];
+  let prefix = '';
+
+  if (isWindows) {
+    const [drive, ...rest] = normalized.split('/');
+    prefix = `${drive}/`;
+    segments.push({ label: `${drive}\\`, path: prefix });
+    rest.forEach((segment) => {
+      if (!segment) return;
+      prefix = `${prefix}${segment}`;
+      segments.push({ label: segment, path: prefix });
+      prefix += '/';
+    });
+  } else {
+    const parts = normalized.split('/').filter(Boolean);
+    if (isUnix) {
+      prefix = '/';
+      segments.push({ label: '/', path: '/' });
+    }
+    parts.forEach((segment) => {
+      if (!segment) return;
+      prefix = prefix === '/' ? `/${segment}` : `${prefix}/${segment}`;
+      segments.push({ label: segment, path: prefix });
+    });
+  }
+
+  segments.forEach((segment, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'breadcrumb-segment';
+    button.textContent = segment.label;
+    button.dataset.path = segment.path;
+    button.addEventListener('click', () => browsePath(segment.path));
+    breadcrumbEl.appendChild(button);
+
+    if (index < segments.length - 1) {
+      const separator = document.createElement('span');
+      separator.className = 'breadcrumb-separator';
+      separator.textContent = '›';
+      breadcrumbEl.appendChild(separator);
+    }
+  });
+}
+
 function setCurrentPath(path) {
   currentPath = path;
   currentPathDisplay.textContent = path || 'No path selected';
   pathInput.value = path || '';
+  renderBreadcrumb(path);
+}
+
+function getDefaultPathForClient(client) {
+  const platform = (client?.metadata?.platform || '').toLowerCase();
+  return platform.includes('win') ? 'C:\\' : '';
 }
 
 function sendCommand(command, args = {}) {
@@ -186,7 +247,8 @@ execForm.addEventListener('submit', (event) => {
 });
 
 listBtn.addEventListener('click', () => {
-  const path = pathInput.value.trim();
+  const selectedClient = clients.find((c) => c.clientId === currentClientId);
+  const path = pathInput.value.trim() || getDefaultPathForClient(selectedClient);
   if (!path) {
     log('Path is required to list directory.');
     return;
@@ -223,11 +285,13 @@ upBtn.addEventListener('click', () => {
 });
 
 refreshBtn.addEventListener('click', () => {
-  if (!currentPath) {
-    log('No current path to refresh.');
+  const selectedClient = clients.find((c) => c.clientId === currentClientId);
+  const path = currentPath || pathInput.value.trim() || getDefaultPathForClient(selectedClient);
+  if (!path) {
+    log('Path is required to refresh.');
     return;
   }
-  browsePath(currentPath);
+  browsePath(path);
 });
 
 clearLogBtn.addEventListener('click', () => {

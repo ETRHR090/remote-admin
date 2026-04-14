@@ -41,15 +41,23 @@
             <button type="submit">Run</button>
           </div>
         </form>
-
+        <div class="terminal-card inside-cli">
+          <div class="terminal-header">
+            <h3>Activity log</h3>
+            <button id="clear-log-btn" type="button">CLS</button>
+          </div>
+          <pre id="log" class="terminal-log"></pre>
+        </div>
       </div>
 
       <div class="card explorer-card">
         <h2>File Explorer</h2>
         <div class="explorer-toolbar">
-          <button id="up-btn" type="button">Up</button>
-          <button id="refresh-btn" type="button">Refresh</button>
-          <span id="current-path-display" class="current-path">No path selected</span>
+          <div class="toolbar-actions">
+            <button id="up-btn" type="button">Up</button>
+            <button id="refresh-btn" type="button">Refresh</button>
+          </div>
+          <div id="breadcrumb" class="explorer-breadcrumb"></div>
         </div>
         <div class="explorer-body">
           <div class="explorer-list">
@@ -58,7 +66,7 @@
           <div class="explorer-detail">
             <div class="path-group">
               <label for="path-input">Current path</label>
-              <input id="path-input" type="text" placeholder="Enter a folder path, then press Refresh" />
+              <input id="path-input" type="text" placeholder="Enter a folder path, then press List directory or Refresh" />
             </div>
             <label for="file-content">File content</label>
             <textarea id="file-content" rows="10" placeholder="File content appears here"></textarea>
@@ -67,13 +75,6 @@
         </div>
       </div>
 
-      <div class="card terminal-card">
-        <div class="terminal-header">
-          <h2>Activity log</h2>
-          <button id="clear-log-btn" type="button">CLS</button>
-        </div>
-        <pre id="log" class="terminal-log"></pre>
-      </div>
     </div>
   </div>
 
