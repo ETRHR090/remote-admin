@@ -1,3 +1,14 @@
 run = "npm install && npm start"
 language = "nodejs"
 modules = ["nodejs-20"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "cloudrun"
+run = ["sh", "-c", "npm install && npm start"]
+
+[agent]
+expertMode = true
