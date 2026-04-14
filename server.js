@@ -27,7 +27,7 @@ const sessionParser = session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: Boolean(HTTPS_KEY && HTTPS_CERT),
+    secure: 'auto', // Works with Replit's proxy
     httpOnly: true,
     sameSite: 'lax',
   },
@@ -54,9 +54,20 @@ app.get('/api/auth-status', (req, res) => {
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-const server = HTTPS_KEY && HTTPS_CERT
-  ? https.createServer({ key: fs.readFileSync(HTTPS_KEY), cert: fs.readFileSync(HTTPS_CERT) }, app)
-  : http.createServer(app);
+let server;
+if (HTTPS_KEY && HTTPS_CERT && fs.existsSync(HTTPS_KEY) && fs.existsSync(HTTPS_CERT)) {
+  try {
+    server = https.createServer({ 
+      key: fs.readFileSync(HTTPS_KEY), 
+      cert: fs.readFileSync(HTTPS_CERT) 
+    }, app);
+  } catch (err) {
+    console.error('Failed to create HTTPS server, falling back to HTTP:', err.message);
+    server = http.createServer(app);
+  }
+} else {
+  server = http.createServer(app);
+}
 
 const wss = new WebSocket.Server({ noServer: true });
 
