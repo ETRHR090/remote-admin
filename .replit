@@ -1,2 +1,3 @@
 run = "npm install && npm start"
 language = "nodejs"
+modules = ["nodejs-20"]
