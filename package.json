@@ -1,0 +1,21 @@
+{
+  "name": "remote-admin",
+  "version": "0.1.0",
+  "description": "Minimal remote admin system with central server and client agent.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "agent": "node client-agent.js",
+    "build-agent": "pkg client-agent.js --out-dir dist --targets node20-win-x64,node20-linux-x64,node20-macos-x64",
+    "ci": "npm install && npm run build-agent"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.4",
+    "express-session": "^1.17.3",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.11.0"
+  }
+}

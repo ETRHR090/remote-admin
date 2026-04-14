@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote Admin Console</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Remote Admin Console</h1>
+
+    <div id="login-panel" class="card">
+      <h2>Admin login</h2>
+      <p>Enter the admin secret to connect.</p>
+      <input type="password" id="admin-secret" placeholder="Admin secret" />
+      <button id="connect-btn">Connect</button>
+      <div id="login-error" class="error"></div>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="card">
+        <h2>Connected clients</h2>
+        <select id="client-select"></select>
+        <div id="client-details"></div>
+      </div>
+
+      <div class="card cli-card">
+        <h2>Command Console</h2>
+        <div class="cmd-toolbar">
+          <button id="ping-btn" type="button">Ping</button>
+          <button id="info-btn" type="button">Client Info</button>
+          <button id="list-btn" type="button">List directory</button>
+          <button id="read-btn" type="button">Read file</button>
+        </div>
+        <form id="exec-form" class="cli-input-form">
+          <label for="exec-command">CLI Command</label>
+          <div class="cli-input-row">
+            <span class="prompt">&gt;&gt;</span>
+            <input id="exec-command" type="text" placeholder="e.g. hostname" autocomplete="off" />
+            <button type="submit">Run</button>
+          </div>
+        </form>
+
+      </div>
+
+      <div class="card explorer-card">
+        <h2>File Explorer</h2>
+        <div class="explorer-toolbar">
+          <button id="up-btn" type="button">Up</button>
+          <button id="refresh-btn" type="button">Refresh</button>
+          <span id="current-path-display" class="current-path">No path selected</span>
+        </div>
+        <div class="explorer-body">
+          <div class="explorer-list">
+            <ul id="file-list" class="file-list"></ul>
+          </div>
+          <div class="explorer-detail">
+            <div class="path-group">
+              <label for="path-input">Current path</label>
+              <input id="path-input" type="text" placeholder="Enter a folder path, then press Refresh" />
+            </div>
+            <label for="file-content">File content</label>
+            <textarea id="file-content" rows="10" placeholder="File content appears here"></textarea>
+            <button id="save-btn" type="button">Save file</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card terminal-card">
+        <div class="terminal-header">
+          <h2>Activity log</h2>
+          <button id="clear-log-btn" type="button">CLS</button>
+        </div>
+        <pre id="log" class="terminal-log"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
